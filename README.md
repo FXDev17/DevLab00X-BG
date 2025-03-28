@@ -1,4 +1,4 @@
-# 💫 About Me:
+# 💫 BLUE / GLEEN DEPLOYMENT PROJECT:
 I am currently working on automating Blue-Green deployments on AWS using Terraform and Jenkins. <br>The project focuses on creating a scalable and highly available infrastructure with VPC, Auto Scaling Groups, and Application Load Balancer, <br>ensuring zero-downtime deployments with Route 53 traffic switching.
 
 # 💻 Tech Stack:
