@@ -34,7 +34,7 @@ data "aws_iam_policy_document" "BG_Pipeline_Permissions_Policy" {
 resource "aws_iam_policy" "BG_Pipeline_Policy" {
   name        = var.aws_iam_policy_name
   description = var.aws_iam_policy_description
-  policy      = data.aws_iam_policy_document.BG_Pipeline_Assume_Role_Policy.json
+  policy      = data.aws_iam_policy_document.BG_Pipeline_Permissions_Policy.json
 }
 
 # Attaching Policy To Role

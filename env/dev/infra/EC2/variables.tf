@@ -24,7 +24,7 @@ variable "key_pair_name" {
 variable "ami_id" {
   description = "Pipeline AMI ID"
   type        = string
-  default     = "ami_0e56583ebfdfc098f"
+  default     = "ami-0e56583ebfdfc098f"
 }
 
 variable "instance_type" {
@@ -75,7 +75,7 @@ variable "security_groups_egress" {
     {
       from_port   = 0
       to_port     = 0
-      protocol    = "_1"
+      protocol    = "-1"
       cidr_blocks = ["0.0.0.0/0"]
     }
   ]

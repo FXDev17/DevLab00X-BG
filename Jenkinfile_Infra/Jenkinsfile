@@ -1,0 +1,142 @@
+pipeline {
+    agent any
+
+    environment {
+        AWS_DEFAULT_REGION = 'eu-west-2'  // Set your region
+    }
+
+    tools {
+        terraform 'Terraform'  // Must match Jenkins tool config
+    }
+
+    stages {
+        stage('Terraform Init') {
+            steps {
+                script {
+                    try {
+                        echo 'Initializing Terraform...'
+                        sh 'terraform init'
+                    } catch (Exception e) {
+                        echo "Terraform Init failed: ${e.getMessage()}"
+                        error 'Stopping pipeline due to Terraform Init failure'
+                    }
+                }
+            }
+        }
+
+        stage('Security Testing') {
+            steps {
+                script {
+                    echo 'Starting Security Tests...'
+
+                    // Checkov: Static code analysis
+                    echo 'Running CheckOV Scan...'
+                    try {
+                        sh  '''
+                            source /opt/security-tools-env/bin/activate
+                            checkov -d . --soft-fail
+                            deactivate
+                            '''
+                     
+                        echo 'Checkov scan completed successfully.'
+                    } catch (Exception e) {
+                        echo "Checkov scan failed: ${e.getMessage()}"
+                    }
+
+                    // Trivy: Filesystem scan
+                    echo 'Running Trivy filesystem scan...'
+                    try {
+                        sh 'trivy fs --exit-code 1 --severity HIGH,CRITICAL .'
+                        echo 'Trivy scan completed successfully.'
+                    } catch (Exception e) {
+                        echo "Trivy scan failed: ${e.getMessage()}"
+                        error 'Stopping pipeline due to critical security issues'
+                    }
+
+                    // Snyk: Dependency vulnerabilities
+                    echo 'Running Snyk vulnerability test...'
+                    try {
+                        sh 'snyk test --severity-threshold=high'
+                        echo 'Snyk test completed successfully.'
+                    } catch (Exception e) {
+                        echo "Snyk test failed: ${e.getMessage()}"
+                        error 'Stopping pipeline due to critical vulnerabilities'
+                    }
+
+                    // Gitleaks: Secrets detection
+                    echo 'Running Gitleaks secrets detection...'
+                    try {
+                        sh 'gitleaks detect --source . --exit-code 1'
+                        echo 'Gitleaks scan completed successfully.'
+                    } catch (Exception e) {
+                        echo "Gitleaks failed: ${e.getMessage()}"
+                        error 'Stopping pipeline due to secrets detected'
+                    }
+
+                    echo 'All security tests completed.'
+                }
+            }
+        }
+
+        stage('Terraform Plan') {
+            steps {
+                script {
+                    try {
+                        echo 'Generating Terraform Plan...'
+                        sh 'terraform plan -out=tfplan'
+                    } catch (Exception e) {
+                        echo "Terraform Plan failed: ${e.getMessage()}"
+                        error 'Stopping pipeline due to Terraform Plan failure'
+                    }
+                }
+            }
+        }
+
+        stage('Approval') {
+            steps {
+                script {
+                    def userInput = input(
+                        id: 'approvePlan',
+                        message: 'Approve Terraform Plan?',
+                        ok: 'Approve',
+                        submitter: 'admin',  // Optional: restrict to admins
+                        parameters: [choice(name: 'ACTION', choices: ['Approve', 'Reject'], description: 'Approve or Reject the plan')]
+                    )
+                    if (userInput == 'Reject') {
+                        echo 'Plan rejected by user.'
+                        error 'Pipeline stopped due to rejection.'
+                    }
+                    echo 'Plan approved. Proceeding...'
+                }
+            }
+        }
+
+
+        stage('Terraform Apply') {
+            steps {
+                script {
+                    try {
+                        echo 'Applying Terraform changes...'
+                        sh 'terraform apply -auto-approve tfplan'
+                    } catch (Exception e) {
+                        echo "Terraform Apply failed: ${e.getMessage()}"
+                        error 'Stopping pipeline due to Terraform Apply failure'
+                    }
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            echo 'Pipeline finished. Cleaning up...'
+            sh 'rm -f tfplan'
+        }
+        success {
+            echo 'Terraform changes applied successfully!'
+        }
+        failure {
+            echo 'Pipeline failed. Review the logs for details.'
+        }
+    }
+}

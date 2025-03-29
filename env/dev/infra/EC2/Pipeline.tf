@@ -15,8 +15,8 @@ resource "aws_instance" "BG_Pipeline" {
   instance_type          = var.instance_type
   key_name               = aws_key_pair.BG_Pipeline_KeyPair.key_name
   vpc_security_group_ids = [aws_security_group.BG_Pipeline_SG.id]
-  user_data              = "${path.module}/scripts/DevLab00X_Pipeline_Script.sh"
   iam_instance_profile   = aws_iam_instance_profile.BG_Pipeline_IProfile.name
+  user_data              = file("${path.module}/scripts/jenkins-pipeline-bootstrap.sh")
   tags                   = var.tags
 }
 
@@ -35,7 +35,7 @@ resource "aws_security_group" "BG_Pipeline_SG" {
   }
 
   dynamic "egress" {
-    for_each = var.security_groups_ingress
+    for_each = var.security_groups_egress
     content {
       from_port   = egress.value.from_port
       to_port     = egress.value.to_port
