@@ -38,7 +38,7 @@ pipeline {
                         //     checkov -d . --soft-fail
                         //     deactivate
                         //     ''' // to use when checkov is created in an venv
-                        sh 'checkov -d . --soft-fail'
+                        sh '/home/ec2-user/.local/bin/checkov -d . --soft-fail'
                         echo 'Checkov scan completed successfully.'
                     } catch (Exception e) {
                         echo "Checkov scan failed: ${e.getMessage()}"
