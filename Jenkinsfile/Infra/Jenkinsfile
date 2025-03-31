@@ -10,6 +10,7 @@ pipeline {
     }
 
     stages {
+        // Pipeline Check Terraform Init
         stage('Terraform Init') {
             steps {
                 script {
@@ -23,7 +24,7 @@ pipeline {
                 }
             }
         }
-
+        // Pipeline Check Security Testing: CheckOV, TRIVY, SNYK, GITLEAKS
         stage('Security Testing') {
             steps {
                 script {
@@ -32,12 +33,12 @@ pipeline {
                     // Checkov: Static code analysis
                     echo 'Running CheckOV Scan...'
                     try {
-                        sh  '''
-                            source /opt/security-tools-env/bin/activate
-                            checkov -d . --soft-fail
-                            deactivate
-                            '''
-                     
+                        // sh  '''
+                        //     source /opt/security-tools-env/bin/activate
+                        //     checkov -d . --soft-fail
+                        //     deactivate
+                        //     ''' // to use when checkov is created in an venv
+                        sh 'checkov -d . --soft-fail'
                         echo 'Checkov scan completed successfully.'
                     } catch (Exception e) {
                         echo "Checkov scan failed: ${e.getMessage()}"
@@ -77,7 +78,7 @@ pipeline {
                 }
             }
         }
-
+        // Pipeline Check Terraform Plan
         stage('Terraform Plan') {
             steps {
                 script {
@@ -91,7 +92,7 @@ pipeline {
                 }
             }
         }
-
+        // Pipeline Check Terraform Approval
         stage('Approval') {
             steps {
                 script {
@@ -110,8 +111,7 @@ pipeline {
                 }
             }
         }
-
-
+        // Pipeline Check Terraform Apply
         stage('Terraform Apply') {
             steps {
                 script {
