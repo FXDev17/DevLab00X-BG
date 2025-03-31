@@ -33,12 +33,12 @@ pipeline {
                     // Checkov: Static code analysis
                     echo 'Running CheckOV Scan...'
                     try {
-                        // sh  '''
-                        //     source /opt/security-tools-env/bin/activate
-                        //     checkov -d . --soft-fail
-                        //     deactivate
-                        //     ''' // to use when checkov is created in an venv
-                        sh 'sudo /home/ec2-user/.local/bin/checkov -d . --soft-fail'
+                        sh  '''
+                            source /opt/security-tools-env/bin/activate
+                            checkov -d . --soft-fail
+                            deactivate
+                            ''' // to use when checkov is created in an venv
+                        // sh 'sudo /home/ec2-user/.local/bin/checkov -d . --soft-fail'
                         echo 'Checkov scan completed successfully.'
                     } catch (Exception e) {
                         echo "Checkov scan failed: ${e.getMessage()}"
