@@ -25,8 +25,14 @@ data "aws_iam_policy_document" "BG_Pipeline_Permissions_Policy" {
       "s3:ListBucket",
       "s3:GetObject",
       "s3:PutObject",
+      "s3:DeleteObject",
     ]
-    resources = ["*"]
+    resources = ["arn:aws:s3:::devlab00-logging", "arn:aws:s3:::devlab00-logging/*"]
+    condition {
+      test = "StringEquals"
+      variable = "ec2:ResourceTag/ManagedBy"
+      values = [ "jenkins" ]
+    }
   }
 }
 

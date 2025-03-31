@@ -27,6 +27,12 @@ variable "ami_id" {
   default     = "ami-0e56583ebfdfc098f"
 }
 
+variable "monitoring" {
+  description = "High Resolution Monitoring"
+  type        = bool
+  default     = false
+}
+
 variable "instance_type" {
   description = "Pipeline Instance Type"
   type        = string
@@ -39,8 +45,14 @@ variable "iam_instance_profile_name" {
   default     = "DevLab00X_BG_Instance_Profile"
 }
 
+variable "ebs_optimized" {
+  description = "Ensures that the Instance has Dedicated Bandwidth "
+  type        = bool
+  default     = true
+}
+
 variable "security_groups_ingress" {
-  description = "value"
+  description = "Pipeline SG Ingress"
   type = list(object({
     from_port   = number
     to_port     = number
@@ -64,7 +76,7 @@ variable "security_groups_ingress" {
 }
 
 variable "security_groups_egress" {
-  description = "value"
+  description = "Pipeline SG Group Egress"
   type = list(object({
     from_port   = number
     to_port     = number
@@ -81,11 +93,31 @@ variable "security_groups_egress" {
   ]
 }
 
+variable "http_endpoint" {
+  description = "Enable or disable the Instance Metadata Service"
+  type        = string
+  default     = "enabled"
+}
+
+variable "http_tokens" {
+  description = "Enforce IMDSv2 (blocks v1)"
+  type        = string
+  default     = "required"
+}
+
+variable "root_block_device_encryption" {
+  description = "Encrypts EBS"
+  type        = bool
+  default     = true
+}
+
+
 variable "tags" {
   description = "Tag For The Jenkins Instance"
   type        = map(string)
   default = {
     "name"        = "00x_BG_PIPELINE"
     "environment" = "Dev"
+    "ManagedBy"   = "jenkins"
   }
 }

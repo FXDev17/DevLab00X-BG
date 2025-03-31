@@ -10,19 +10,32 @@ resource "aws_key_pair" "BG_Pipeline_KeyPair" {
 }
 
 # Creating Jenkins Pipeline
+# checkov:skip=CKV_AWS_126: Detailed monitoring NOT required for personal project
 resource "aws_instance" "BG_Pipeline" {
   ami                    = var.ami_id
   instance_type          = var.instance_type
+  ebs_optimized          = var.ebs_optimized
   key_name               = aws_key_pair.BG_Pipeline_KeyPair.key_name
   vpc_security_group_ids = [aws_security_group.BG_Pipeline_SG.id]
   iam_instance_profile   = aws_iam_instance_profile.BG_Pipeline_IProfile.name
   user_data              = file("${path.module}/scripts/jenkins-pipeline-bootstrap.sh")
+  monitoring             = var.monitoring
   tags                   = var.tags
+
+  root_block_device {
+    encrypted = var.root_block_device_encryption
+  }
+
+  metadata_options {
+    http_endpoint = var.http_endpoint
+    http_tokens   = var.http_tokens
+  }
 }
 
 # Creating Security Groups
-resource "aws_security_group" "BG_Pipeline_SG" {
-  name_prefix = "BG_Pipeline_SG"
+resource "aws_security_group" "BG_Pipeline_SG_In" {
+  name_prefix = "BG_Pipeline_SG_In"
+  description = var.security_groups_ingress.description
 
   dynamic "ingress" {
     for_each = var.security_groups_ingress
@@ -33,6 +46,12 @@ resource "aws_security_group" "BG_Pipeline_SG" {
       cidr_blocks = ingress.value.cidr_blocks
     }
   }
+}
+
+# Creating Security Groups
+resource "aws_security_group" "BG_Pipeline_SG_Out" {
+  name_prefix = "BG_Pipeline_SG_Out"
+  description = var.security_groups_egress.description
 
   dynamic "egress" {
     for_each = var.security_groups_egress
