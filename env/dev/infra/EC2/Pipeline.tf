@@ -6,7 +6,7 @@ module "bg_pipeline_role_import" {
 # Creating KeyPair
 resource "aws_key_pair" "BG_Pipeline_KeyPair" {
   key_name   = var.key_pair_name
-  public_key = file("~/.ssh/jenkins-dev-pipeline-keys.pub")
+  public_key = var.ssh_public_key 
   lifecycle {
     ignore_changes = [public_key]
   }

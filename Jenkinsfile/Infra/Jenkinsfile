@@ -3,6 +3,7 @@ pipeline {
 
     environment {
         AWS_DEFAULT_REGION = 'eu-west-2'  // Set your region
+        SSH_KEY = credentials('jenkins_ssh_public_key')
     }
 
     tools {
@@ -78,7 +79,7 @@ pipeline {
                         dir('env/dev') {
                             // Run terraform plan from the correct directory
                             sh 'terraform init'
-                            sh 'terraform plan -out=tfplan'
+                            sh "terraform plan -var 'ssh_public_key=${SSH_KEY}' -out=tfplan"
                         }
                     } catch (Exception e) {
                         echo "Terraform Plan failed: ${e.getMessage()}"

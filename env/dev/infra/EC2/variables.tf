@@ -8,6 +8,12 @@ variable "key_pair_name" {
   default     = "00X_BG_Pipeline"
 }
 
+variable "ssh_public_key" {
+  description = "Pipeline KeyPair Key"
+  type        = string
+}
+
+
 # variable "key_pair_path" {
 #   description = "Pipeline Key Pair Path"
 #   type        = string
