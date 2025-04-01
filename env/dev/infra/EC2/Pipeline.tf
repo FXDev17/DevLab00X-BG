@@ -47,9 +47,9 @@ resource "aws_security_group" "BG_Pipeline_SG_In" {
 
   dynamic "ingress" {
     for_each = var.security_groups_ingress
-    # checkov:skip=CCKV_AWS_24:Dev Projects No Need To Restrict
 
     content {
+      # checkov:skip=CCKV_AWS_24:Dev Projects No Need To Restrict
       from_port   = ingress.value.from_port
       to_port     = ingress.value.to_port
       protocol    = ingress.value.protocol
