@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         AWS_DEFAULT_REGION = 'eu-west-2'  // Set your region
-        SSH_KEY = credentials('jenkins_ssh_public_key')
+        // SSH_KEY = credentials('jenkins_ssh_public_key')
     }
 
     tools {
