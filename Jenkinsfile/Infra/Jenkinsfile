@@ -77,9 +77,14 @@ pipeline {
                         
                         // Change to the env/dev directory before running terraform commands
                         dir('env/dev') {
-                            // Run terraform plan from the correct directory
-                            sh 'terraform init'
-                            sh "terraform plan -var 'ssh_public_key=${SSH_KEY}' -out=tfplan"
+                            // Securely pass the SSH key using withCredentials
+                            withCredentials([string(credentialsId: 'jenkins_ssh_public_key', variable: 'SSH_KEY')]) {
+                                // Initialize Terraform
+                                sh 'terraform init'
+                                
+                                // Run terraform plan from the correct directory and securely pass the SSH key
+                                sh "terraform plan -var 'ssh_public_key=${SSH_KEY}' -out=tfplan"
+                            }
                         }
                     } catch (Exception e) {
                         echo "Terraform Plan failed: ${e.getMessage()}"
@@ -88,6 +93,7 @@ pipeline {
                 }
             }
         }
+
         // Pipeline Check Terraform Approval
         stage('Approval') {
             steps {
