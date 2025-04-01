@@ -10,22 +10,6 @@ pipeline {
     }
 
     stages {
-        // Pipeline Check Terraform Init
-        stage('Terraform Init') {
-            steps {
-                script {
-                    try {
-                        echo 'Initializing Terraform...'
-                        dir('env/dev') {
-                            sh 'terraform init'
-                        }
-                    } catch (Exception e) {
-                        echo "Terraform Init failed: ${e.getMessage()}"
-                        error 'Stopping pipeline due to Terraform Init failure'
-                    }
-                }
-            }
-        }
         // Pipeline Check Security Testing: CheckOV, TRIVY, SNYK, GITLEAKS
         stage('Security Testing') {
             steps {
@@ -82,6 +66,7 @@ pipeline {
                 }
             }
         }
+
         // Pipeline Check Terraform Plan
         stage('Terraform Plan') {
             steps { 
@@ -91,11 +76,8 @@ pipeline {
                         
                         // Change to the env/dev directory before running terraform commands
                         dir('env/dev') {
-                            // List files to verify we're in the correct directory
-                            sh "pwd"
-                            sh 'ls -la'
-                            
                             // Run terraform plan from the correct directory
+                            sh 'terraform init'
                             sh 'terraform plan -out=tfplan'
                         }
                     } catch (Exception e) {
@@ -130,7 +112,8 @@ pipeline {
                 script {
                     try {
                         echo 'Applying Terraform changes...'
-                        dir('DevLab00X-BG/env/dev') {
+                        dir('env/dev') {
+                            
                             sh 'terraform apply -auto-approve tfplan'
                         }
                     } catch (Exception e) {
