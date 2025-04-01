@@ -58,6 +58,9 @@ variable "security_groups_ingress" {
     to_port     = number
     protocol    = string
     cidr_blocks = list(string)
+    description = string
+
+
   }))
   default = [
     {
@@ -76,7 +79,7 @@ variable "security_groups_ingress" {
 }
 
 variable "security_groups_egress" {
-  description = "Pipeline SG Group Egress"
+  description = "Pipeline SG Egress"
   type = list(object({
     from_port   = number
     to_port     = number
@@ -89,6 +92,8 @@ variable "security_groups_egress" {
       to_port     = 0
       protocol    = "-1"
       cidr_blocks = ["0.0.0.0/0"]
+      description = string
+
     }
   ]
 }

@@ -10,7 +10,7 @@ resource "aws_key_pair" "BG_Pipeline_KeyPair" {
 }
 
 # Creating Jenkins Pipeline
-# checkov:skip=CKV_AWS_126: Detailed monitoring NOT required for personal project
+# checkov:skip=CKV_AWS_126:Detailed monitoring NOT required for personal project
 resource "aws_instance" "BG_Pipeline" {
   ami                    = var.ami_id
   instance_type          = var.instance_type
@@ -30,12 +30,19 @@ resource "aws_instance" "BG_Pipeline" {
     http_endpoint = var.http_endpoint
     http_tokens   = var.http_tokens
   }
+
+  security_groups = [ 
+    aws_security_group.BG_Pipeline_SG_In.name,
+    aws_security_group.BG_Pipeline_SG_Out.name
+    
+   ]
 }
 
 # Creating Security Groups
+# checkov:skip=CCKV_AWS_24:Dev Projects No Need To Restrict
 resource "aws_security_group" "BG_Pipeline_SG_In" {
   name_prefix = "BG_Pipeline_SG_In"
-  description = var.security_groups_ingress.description
+  description = "Ingress rules for BG Pipeline"
 
   dynamic "ingress" {
     for_each = var.security_groups_ingress
@@ -44,6 +51,7 @@ resource "aws_security_group" "BG_Pipeline_SG_In" {
       to_port     = ingress.value.to_port
       protocol    = ingress.value.protocol
       cidr_blocks = ingress.value.cidr_blocks
+      description = ingress.value.description
     }
   }
 }
@@ -51,7 +59,7 @@ resource "aws_security_group" "BG_Pipeline_SG_In" {
 # Creating Security Groups
 resource "aws_security_group" "BG_Pipeline_SG_Out" {
   name_prefix = "BG_Pipeline_SG_Out"
-  description = var.security_groups_egress.description
+  description = "Egress rules for BG Pipeline"
 
   dynamic "egress" {
     for_each = var.security_groups_egress
@@ -60,6 +68,7 @@ resource "aws_security_group" "BG_Pipeline_SG_Out" {
       to_port     = egress.value.to_port
       protocol    = egress.value.protocol
       cidr_blocks = egress.value.cidr_blocks
+      description = egress.value.description
     }
   }
 }
