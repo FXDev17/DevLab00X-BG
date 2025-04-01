@@ -9,16 +9,14 @@ pipeline {
         terraform 'Terraform'  // Must match Jenkins tool config
     }
 
+    stages {
+        // Pipeline Check Terraform Init
         stage('Terraform Init') {
             steps {
                 script {
                     try {
                         echo 'Initializing Terraform...'
-                        
-                        // Change to the env/dev directory before running terraform init
-                        dir('DevLab00X-BG/env/dev') {
-                            sh 'terraform init'
-                        }
+                        sh 'terraform init'
                     } catch (Exception e) {
                         echo "Terraform Init failed: ${e.getMessage()}"
                         error 'Stopping pipeline due to Terraform Init failure'
@@ -26,7 +24,6 @@ pipeline {
                 }
             }
         }
-
         // Pipeline Check Security Testing: CheckOV, TRIVY, SNYK, GITLEAKS
         stage('Security Testing') {
             steps {
@@ -131,11 +128,7 @@ pipeline {
                 script {
                     try {
                         echo 'Applying Terraform changes...'
-                        
-                        // Change to the env/dev directory before running terraform apply
-                        dir('DevLab00X-BG/env/dev') {
-                            sh 'terraform apply -auto-approve tfplan'
-                        }
+                        sh 'terraform apply -auto-approve tfplan'
                     } catch (Exception e) {
                         echo "Terraform Apply failed: ${e.getMessage()}"
                         error 'Stopping pipeline due to Terraform Apply failure'
