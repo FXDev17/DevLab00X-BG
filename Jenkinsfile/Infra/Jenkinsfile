@@ -16,7 +16,9 @@ pipeline {
                 script {
                     try {
                         echo 'Initializing Terraform...'
-                        sh 'terraform init'
+                        dir('env/dev') {
+                            sh 'terraform init'
+                        }
                     } catch (Exception e) {
                         echo "Terraform Init failed: ${e.getMessage()}"
                         error 'Stopping pipeline due to Terraform Init failure'
@@ -128,7 +130,9 @@ pipeline {
                 script {
                     try {
                         echo 'Applying Terraform changes...'
-                        sh 'terraform apply -auto-approve tfplan'
+                        dir('DevLab00X-BG/env/dev') {
+                            sh 'terraform apply -auto-approve tfplan'
+                        }
                     } catch (Exception e) {
                         echo "Terraform Apply failed: ${e.getMessage()}"
                         error 'Stopping pipeline due to Terraform Apply failure'
