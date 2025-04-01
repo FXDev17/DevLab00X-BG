@@ -86,7 +86,7 @@ pipeline {
                 script {
                     try {
                         echo 'Generating Terraform Plan...'
-                        sh 'sudo ls -la'
+                        sh 'ls -la'
                         sh 'terraform plan -out=tfplan'
                     } catch (Exception e) {
                         echo "Terraform Plan failed: ${e.getMessage()}"
