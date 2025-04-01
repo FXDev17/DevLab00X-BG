@@ -88,14 +88,14 @@ pipeline {
                         echo 'Generating Terraform Plan...'
                         
                         // Change to the env/dev directory before running terraform commands
-                        
-                        // List files to verify we're in the correct directory
-                        sh "pwd"
-                        sh 'ls -la'
+                        dir('env/dev') {
+                            // List files to verify we're in the correct directory
+                            sh "pwd"
+                            sh 'ls -la'
                             
-                        // Run terraform plan from the correct directory
-                        sh 'terraform plan -out=tfplan'
-                    
+                            // Run terraform plan from the correct directory
+                            sh 'terraform plan -out=tfplan'
+                        }
                     } catch (Exception e) {
                         echo "Terraform Plan failed: ${e.getMessage()}"
                         error 'Stopping pipeline due to Terraform Plan failure'
