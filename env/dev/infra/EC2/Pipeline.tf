@@ -10,8 +10,8 @@ resource "aws_key_pair" "BG_Pipeline_KeyPair" {
 }
 
 # Creating Jenkins Pipeline
-# checkov:skip=CKV_AWS_126:Detailed monitoring NOT required for personal project
 resource "aws_instance" "BG_Pipeline" {
+  # checkov:skip=CKV_AWS_126:Detailed monitoring NOT required for personal project
   ami                    = var.ami_id
   instance_type          = var.instance_type
   ebs_optimized          = var.ebs_optimized
@@ -39,8 +39,9 @@ resource "aws_instance" "BG_Pipeline" {
 }
 
 # Creating Security Groups
-# checkov:skip=CCKV_AWS_24:Dev Projects No Need To Restrict
+
 resource "aws_security_group" "BG_Pipeline_SG_In" {
+  # checkov:skip=CCKV_AWS_24:Dev Projects No Need To Restrict
   name_prefix = "BG_Pipeline_SG_In"
   description = "Ingress rules for BG Pipeline"
 
