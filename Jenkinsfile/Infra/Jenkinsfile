@@ -9,14 +9,16 @@ pipeline {
         terraform 'Terraform'  // Must match Jenkins tool config
     }
 
-    stages {
-        // Pipeline Check Terraform Init
         stage('Terraform Init') {
             steps {
                 script {
                     try {
                         echo 'Initializing Terraform...'
-                        sh 'terraform init'
+                        
+                        // Change to the env/dev directory before running terraform init
+                        dir('DevLab00X-BG/env/dev') {
+                            sh 'terraform init'
+                        }
                     } catch (Exception e) {
                         echo "Terraform Init failed: ${e.getMessage()}"
                         error 'Stopping pipeline due to Terraform Init failure'
@@ -24,6 +26,7 @@ pipeline {
                 }
             }
         }
+
         // Pipeline Check Security Testing: CheckOV, TRIVY, SNYK, GITLEAKS
         stage('Security Testing') {
             steps {
@@ -82,12 +85,20 @@ pipeline {
         }
         // Pipeline Check Terraform Plan
         stage('Terraform Plan') {
-            steps {
+            steps { 
                 script {
                     try {
                         echo 'Generating Terraform Plan...'
-                        sh 'ls -la'
-                        sh 'terraform plan -out=tfplan'
+                        
+                        // Change to the env/dev directory before running terraform commands
+                        dir('DevLab00X-BG/env/dev') {
+                            // List files to verify we're in the correct directory
+                            sh "pwd"
+                            sh 'ls -la'
+                            
+                            // Run terraform plan from the correct directory
+                            sh 'terraform plan -out=tfplan'
+                        }
                     } catch (Exception e) {
                         echo "Terraform Plan failed: ${e.getMessage()}"
                         error 'Stopping pipeline due to Terraform Plan failure'
@@ -120,7 +131,11 @@ pipeline {
                 script {
                     try {
                         echo 'Applying Terraform changes...'
-                        sh 'terraform apply -auto-approve tfplan'
+                        
+                        // Change to the env/dev directory before running terraform apply
+                        dir('DevLab00X-BG/env/dev') {
+                            sh 'terraform apply -auto-approve tfplan'
+                        }
                     } catch (Exception e) {
                         echo "Terraform Apply failed: ${e.getMessage()}"
                         error 'Stopping pipeline due to Terraform Apply failure'

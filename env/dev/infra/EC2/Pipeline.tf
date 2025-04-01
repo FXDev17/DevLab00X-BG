@@ -16,7 +16,7 @@ resource "aws_instance" "BG_Pipeline" {
   instance_type          = var.instance_type
   ebs_optimized          = var.ebs_optimized
   key_name               = aws_key_pair.BG_Pipeline_KeyPair.key_name
-  vpc_security_group_ids = [aws_security_group.BG_Pipeline_SG.id]
+  vpc_security_group_ids = [aws_security_group.BG_Pipeline_SG_In.id, aws_security_group.BG_Pipeline_SG_Out.id]
   iam_instance_profile   = aws_iam_instance_profile.BG_Pipeline_IProfile.name
   user_data              = file("${path.module}/scripts/jenkins-pipeline-bootstrap.sh")
   monitoring             = var.monitoring

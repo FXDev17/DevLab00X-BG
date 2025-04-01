@@ -68,12 +68,14 @@ variable "security_groups_ingress" {
       to_port     = 22
       protocol    = "tcp"
       cidr_blocks = ["0.0.0.0/0"]
+      description = "SSH access"
     },
     {
       from_port   = 8080
       to_port     = 8080
       protocol    = "tcp"
       cidr_blocks = ["0.0.0.0/0"]
+      description = "HTTP access" 
     }
   ]
 }
@@ -85,6 +87,7 @@ variable "security_groups_egress" {
     to_port     = number
     protocol    = string
     cidr_blocks = list(string)
+    description = string
   }))
   default = [
     {
@@ -92,8 +95,7 @@ variable "security_groups_egress" {
       to_port     = 0
       protocol    = "-1"
       cidr_blocks = ["0.0.0.0/0"]
-      description = string
-
+      description = "All All outbound traffic"
     }
   ]
 }
