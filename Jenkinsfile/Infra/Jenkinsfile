@@ -57,8 +57,6 @@ pipeline {
                     echo 'Running Snyk vulnerability test...'
                     sh 'ls -la .'  // Debug
                     try {
-                        sh 'npm install -g snyk'  // Install Snyk
-                        sh 'curl -I https://snyk.io'  // Debug: Check network
                         withCredentials([string(credentialsId: 'snyk-token', variable: 'SNYK_TOKEN')]) {
                             sh 'snyk auth $SNYK_TOKEN && echo "Snyk authenticated successfully"'
                             sh 'snyk iac test . --severity-threshold=high -d || true'
@@ -88,6 +86,7 @@ pipeline {
                 script {
                     try {
                         echo 'Generating Terraform Plan...'
+                        sh 'sudo ls -la'
                         sh 'terraform plan -out=tfplan'
                     } catch (Exception e) {
                         echo "Terraform Plan failed: ${e.getMessage()}"
